@@ -66,6 +66,7 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
+    
 
     // Packages API
     app.post('/packages', async (req, res)=> {
@@ -81,7 +82,6 @@ async function run() {
   })
 
   app.get('/packages/:id', async(req, res)=> {
-    const id = req.params.id;
     const query = {_id: new ObjectId(req.params.id)}
     const result = await packagesCollection.findOne(query);
     res.send(result);
