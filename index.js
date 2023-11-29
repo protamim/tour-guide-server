@@ -28,6 +28,7 @@ async function run() {
     // await client.connect();
 
     const userCollection = client.db('bhramanDb').collection('users');
+    const packagesCollection = client.db('bhramanDb').collection('packages');
 
     // user related API
     app.get('/users', async(req, res)=> {
@@ -66,8 +67,25 @@ async function run() {
       res.send(result);
     })
 
+    // Packages API
+    app.post('/packages', async (req, res)=> {
+      const package = req.body;
+      const result = await packagesCollection.insertOne(package);
+      res.send(result);
+      console.log(package);
+  })
 
+  app.get('/packages', async(req, res)=> {
+    const result = await packagesCollection.find().toArray();
+    res.send(result);
+  })
 
+  app.get('/packages/:id', async(req, res)=> {
+    const id = req.params.id;
+    const query = {_id: new ObjectId(req.params.id)}
+    const result = await packagesCollection.findOne(query);
+    res.send(result);
+  })
 
 
     // Send a ping to confirm a successful connection
