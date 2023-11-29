@@ -1,12 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const express = require("express");
+const cors = require("cors");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 4000;
 // Dotenv
-require('dotenv').config()
+require("dotenv").config();
 // middleware
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 
 console.log(process.env.USER_PASS);
@@ -19,7 +19,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
@@ -27,70 +27,76 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    const userCollection = client.db('bhramanDb').collection('users');
-    const packagesCollection = client.db('bhramanDb').collection('packages');
+    const userCollection = client.db("bhramanDb").collection("users");
+    const packagesCollection = client.db("bhramanDb").collection("packages");
 
     // user related API
-    app.get('/users', async(req, res)=> {
+    app.get("/users", async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
-    })
+    });
 
-    app.post('/users', async (req, res)=> {
-        const user = req.body;
-        const result = await userCollection.insertOne(user);
-        res.send(result);
-        console.log(user);
-    })
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+      console.log(user);
+    });
 
     // Make Admin API
-    app.patch('/users/admin/:id', async (req, res) => {
-      const filter = {_id: new ObjectId(req.params.id)}
+    app.patch("/users/admin/:id", async (req, res) => {
+      const filter = { _id: new ObjectId(req.params.id) };
       const updateDoc = {
         $set: {
-          role: 'admin'
-        }
-      }
+          role: "admin",
+        },
+      };
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
-    })
+    });
 
     // Make Tour Guide API
-    app.patch('/users/tour-guide/:id', async (req, res)=> {
-      const filter = {_id: new ObjectId(req.params.id)}
+    app.patch("/users/tour-guide/:id", async (req, res) => {
+      const filter = { _id: new ObjectId(req.params.id) };
       const updateDoc = {
         $set: {
-          role: 'tour guide'
-        }
-      }
+          role: "tour guide",
+        },
+      };
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
-    })
-    
+    });
+
+    app.get("/users/tour-guide/:id", async (req, res) => {
+      const query = { _id: new ObjectId(req.params.id) };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
 
     // Packages API
-    app.post('/packages', async (req, res)=> {
+    app.post("/packages", async (req, res) => {
       const package = req.body;
       const result = await packagesCollection.insertOne(package);
       res.send(result);
       console.log(package);
-  })
+    });
 
-  app.get('/packages', async(req, res)=> {
-    const result = await packagesCollection.find().toArray();
-    res.send(result);
-  })
+    app.get("/packages", async (req, res) => {
+      const result = await packagesCollection.find().toArray();
+      res.send(result);
+    });
 
-  app.get('/packages/:id', async(req, res)=> {
-    const query = {_id: new ObjectId(req.params.id)}
-    const result = await packagesCollection.findOne(query);
-    res.send(result);
-  })
-
+    app.get("/packages/:id", async (req, res) => {
+      const query = { _id: new ObjectId(req.params.id) };
+      const result = await packagesCollection.findOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -98,12 +104,9 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
-
-app.get('/', (req, res)=> {
-    res.send('Bhraman Guide Server is running...');
-})
-app.listen(port, ()=> {
-    console.log(`Bhraman Guide app listening on port ${port}`);
-})
+app.get("/", (req, res) => {
+  res.send("Bhraman Guide Server is running...");
+});
+app.listen(port, () => {
+  console.log(`Bhraman Guide app listening on port ${port}`);
+});
