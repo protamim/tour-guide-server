@@ -29,6 +29,7 @@ async function run() {
 
     const userCollection = client.db("bhramanDb").collection("users");
     const packagesCollection = client.db("bhramanDb").collection("packages");
+    const bookingCollection = client.db("bhramanDb").collection("booking");
 
     // user related API
     app.get("/users", async (req, res) => {
@@ -90,6 +91,14 @@ async function run() {
       const query = { _id: new ObjectId(req.params.id) };
       const result = await packagesCollection.findOne(query);
       res.send(result);
+    });
+
+    // Booking API
+    app.post("/booking", async (req, res) => {
+      const book = req.body;
+      const result = await bookingCollection.insertOne(book);
+      res.send(result);
+      console.log(book);
     });
 
     // Send a ping to confirm a successful connection
