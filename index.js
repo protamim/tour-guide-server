@@ -30,6 +30,7 @@ async function run() {
     const userCollection = client.db("bhramanDb").collection("users");
     const packagesCollection = client.db("bhramanDb").collection("packages");
     const bookingCollection = client.db("bhramanDb").collection("booking");
+    const wishListCollection = client.db("bhramanDb").collection("wishList");
 
     // user related API
     app.get("/users", async (req, res) => {
@@ -43,6 +44,19 @@ async function run() {
       res.send(result);
       console.log(user);
     });
+
+    app.patch('/users', async(req, res)=> {
+      const body = req.body;
+      const filter = {email: req.body.email}
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          ...body,
+        }
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
 
     // Make Admin API
     app.patch("/users/admin/:id", async (req, res) => {
@@ -94,12 +108,40 @@ async function run() {
     });
 
     // Booking API
+    app.get("/booking", async (req, res) => {
+      const result = await bookingCollection.find().toArray();
+      res.send(result);
+    });
+    app.get("/booking/:email", async (req, res) => {
+      const query = {tourist_email: req.params.email}
+      const result = await bookingCollection.find(query).toArray();
+      res.send(result);
+      console.log(query);
+    });
     app.post("/booking", async (req, res) => {
       const book = req.body;
       const result = await bookingCollection.insertOne(book);
       res.send(result);
       console.log(book);
     });
+
+    // Wishlist API
+    app.get("/wishlist", async (req, res) => {
+      const result = await wishListCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post('/wishlist', async(req, res)=> {
+      const book = req.body;
+      const result = await wishListCollection.insertOne(book);
+      res.send(result);
+    })
+
+    app.delete('/wishlist/:id', async(req, res)=> {
+      const query = {_id: new ObjectId(req.params.id)}
+      const result = await wishListCollection.deleteOne(query);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
